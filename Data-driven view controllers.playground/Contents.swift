@@ -3,57 +3,6 @@ import UIKit
 import PlaygroundSupport
 import Foundation
 
-public enum ScreenType: RawRepresentable {
-    case iPhoneSE
-    case iPhone6
-    case iPhone7Plus
-    case iPhoneX
-    
-    public typealias RawValue = CGSize
-    
-    public init?(rawValue: ScreenType.RawValue) {
-        switch rawValue {
-        case CGSize(width: 320, height: 568):
-            self = .iPhoneSE
-        case CGSize(width: 375, height: 667):
-            self = .iPhone6
-        case CGSize(width: 414, height: 736):
-            self = .iPhone7Plus
-        case CGSize(width: 375, height: 812):
-            self = .iPhoneX
-        default:
-            return nil
-        }
-    }
-    
-    public var rawValue: CGSize {
-        switch self {
-        case .iPhoneSE:
-            return CGSize(width: 320, height: 568)
-        case .iPhone6:
-            return CGSize(width: 375, height: 667)
-        case .iPhone7Plus:
-            return CGSize(width: 414, height: 736)
-        case .iPhoneX:
-            return CGSize(width: 375, height: 812)
-        }
-    }
-}
-
-public func prepareForLiveView<VC: UIViewController>(
-    screenType: ScreenType = .iPhoneSE,
-    scale: CGFloat = 1.0,
-    isPortrait: Bool = true,
-    viewController: VC
-) -> UIWindow {
-    let size = CGSize(width: screenType.rawValue.width * scale, height: screenType.rawValue.height * scale)
-    let window = UIWindow(frame: CGRect(origin: .zero, size: isPortrait ? size : CGSize(width: size.height, height: size.width)))
-    window.rootViewController = viewController
-    window.makeKeyAndVisible()
-    return window
-}
-
-
 class MyViewController: UIViewController {
     override func loadView() {
         super.loadView()
@@ -63,4 +12,35 @@ class MyViewController: UIViewController {
 }
 
 let vc = MyViewController()
-PlaygroundPage.current.liveView = prepareForLiveView(viewController: vc)
+
+PlaygroundPage.current.liveView = vc
+
+extension UIView {
+    func makeButton(title: String, centerXAnchorConstant: CGFloat = 0, target: Any, selector: Selector) -> UIButton {
+        let button = UIButton(type: .custom)
+        button.setTitle(title, for: .normal)
+        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.gray, for: .disabled)
+        addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.centerXAnchor.constraint(equalTo: centerXAnchor, constant: centerXAnchorConstant).isActive = true
+        button.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 50).isActive = true
+        button.addTarget(target, action: selector, for: .touchUpInside)
+        return button
+    }
+    
+    func makeTextView(delegate: UITextViewDelegate, centerYAnchorConstant: CGFloat) -> UITextView {
+         let textView = UITextView()
+         textView.translatesAutoresizingMaskIntoConstraints = false
+         textView.font = UIFont.systemFont(ofSize: 35)
+         addSubview(textView)
+         textView.delegate = delegate
+         textView.widthAnchor.constraint(equalTo: widthAnchor, constant: -50).isActive = true
+         textView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+         textView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+         textView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: centerYAnchorConstant).isActive = true
+         textView.layer.borderColor = UIColor.red.cgColor
+         textView.layer.borderWidth = 1
+         return textView
+     }
+}
